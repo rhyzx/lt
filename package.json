@@ -1,0 +1,24 @@
+{
+  "name"        : "lt",
+  "description" : "Little Template engine",
+  "version"     : "0.1.0",
+  "author"      : "rhyzx",
+  "homepage"    : "https://github.com/rhyzx/lt",
+  "keywords"    : [ "template", "html", "little" ],
+  
+  "repository"  : { "type": "git", "url": "git@github.com:rhyzx/lt.git" },  
+  "bugs"        : { "url": "https://github.com/rhyzx/lt/issues" },
+
+  "main"        : "lt",
+  
+  "devDependencies" : {
+    "mocha"     : "1.8.x",
+    "should"    : "1.2.x"
+  },
+  "scripts"     : {
+    "test"      : "mocha -R spec"
+  },
+
+  "licenses"    : { "type": "MIT", "url": "http://github.com/rhyzx/lt/raw/master/LICENSE" }
+}
+
