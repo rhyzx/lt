@@ -17,7 +17,7 @@
             .replace(re.backSlash, "\\\\")  // escape \
             .replace(re.quote, "\\'")       // escape '
             .replace(re.va, function (a, v) {
-                vars += v +"=_DATA." +v +"||'', " // pre-define variable
+                vars += v +"=_DATA." +v +", " // pre-define variable
                 return "' +" +v +" +'"      // print variables
             })
             .replace(re.stmt, "'; $1 _S+='") // statements
