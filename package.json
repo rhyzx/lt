@@ -1,7 +1,7 @@
 {
   "name"        : "lt",
   "description" : "Little Template engine",
-  "version"     : "0.1.0",
+  "version"     : "0.1.1",
   "author"      : "rhyzx",
   "homepage"    : "https://github.com/rhyzx/lt",
   "keywords"    : [ "template", "html", "little" ],
