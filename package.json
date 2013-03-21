@@ -1,10 +1,10 @@
 {
   "name"        : "lt",
-  "description" : "Little Template engine",
+  "description" : "Little Template engine for {{mustache}}",
   "version"     : "0.1.1",
   "author"      : "rhyzx",
   "homepage"    : "https://github.com/rhyzx/lt",
-  "keywords"    : [ "template", "html", "little" ],
+  "keywords"    : [ "template", "html", "little", "mustache", "logicless" ],
   
   "repository"  : { "type": "git", "url": "git@github.com:rhyzx/lt.git" },  
   "bugs"        : { "url": "https://github.com/rhyzx/lt/issues" },
