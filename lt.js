@@ -1,30 +1,53 @@
 !(function (root, undefined) {
     "use strict" 
 
-    // cache regex
-    var re = {
-        backSlash   : /\\/g
-      , quote       : /'/g
-      , va          : /\{\{(\w+)\}\}/g
-      , stmt        : /\/\/#(.+)(?:\n|$)/g
-      , cr          : /\n/g
+    // escape HTML chars http://www.w3.org/TR/html4/charset.html#h-5.3.2
+    var escapes = { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }
+    function get(val, escape) {
+        if (typeof val === 'undefined') return ''
+        return !escape ? val : (val +'').replace(/[<>&"]/g, function (char) {
+            return escapes[char]
+        })
     }
 
     // core
     function compile(source) {
-        var vars = "_DATA = _DATA || {}; var "
-        var body = "_TMP = '" +source
-            .replace(re.backSlash, "\\\\")      // escape \
-            .replace(re.quote, "\\'")           // escape '
-            .replace(re.va, function (a, v) {
-                vars += v +"=_DATA." +v +", "   // pre-define variable
-                return "' +" +v +" +'"          // print variables
+        var body = "ctx = ctx || {}; result = '" +source
+            .replace(/\\/g, "\\\\") // escape \
+            .replace(/'/g, "\\'") // escape '
+            .replace(/\{\{(.+?)\}\}/g, function (a, scope) { // block
+                var reverse = false, escape = true
+                switch (scope[0]) {
+                case '^':   // if not
+                    reverse = true
+                case '#':   // if/each/TODO helper
+                    return "';(function (ctx, parent) {" // block context
+                            + "var arr = ctx "
+                            + "? Object.prototype.toString.call(ctx) === '[object Array]' "
+                            + (reverse ? "? [] : [] : [parent]" : "? ctx : [ctx] : []")
+                            + "; for (var i=0, len=arr.length; i<len; i++)"
+                            + "{ ctx = arr[i]; result+='"
+                case '/':   // close block
+                    return "'; }}).call(this, ctx." +scope.slice(1) +", ctx); result+= '"
+                case '!':   // comments
+                    return ""
+                case '&':   // print unescape
+                    escape = false
+                default :   // print escape
+                    return "' +this(ctx" +(scope === 'this' ? '' : '.' +scope) +", " +escape +") +'"
+                }
             })
-            .replace(re.stmt, "'; $1 _TMP+='")  // statements
-            .replace(re.cr, "\\n")              // escape cr
-            +"'; return _TMP"
-        var template =  new Function('_DATA', vars +body)
-        return template.render = template       // render api
+            .replace(/\n/g, "\\n") // escape cr
+            +"'; return result"
+
+        var compiled = new Function('ctx', body)
+          , template = function (data) {
+            return compiled.call(get, data)
+        }
+        template.toString = function () {
+            return compiled.toString()
+        }
+        return template.render = template // render api
     }
 
     // compile api
