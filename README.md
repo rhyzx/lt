@@ -54,29 +54,6 @@ level is an undefined value(null/undefined).
 this is {{path.to.value}}
 ```
 
-### `this` context
-
-Access the current context by `this` variable, useful in iterating a list with
-pure values.
-
-data
-```json
-{
-  "items" : [
-    "first",
-    "second",
-    "third"
-  ]
-}
-```
-
-template
-```mustache
-{{#items}}
-    {{this}}
-{{/items}}
-```
-
 
 API
 ---

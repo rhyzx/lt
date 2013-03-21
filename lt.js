@@ -22,7 +22,7 @@
             for (var i=0, len=arr.length; i<len; i++) {
                 iterator.call(this, arr[i], i, arr)
             }
-        } 
+        }
     }
 
     // core
@@ -46,7 +46,7 @@
                     escape = false
                 default :   // print escape
                     return "' +this.print(ctx"
-                            + (scope === 'this' ? '' : '.' +scope)
+                            + (scope === '.' ? '' : '.' +scope)
                             + ", " +escape +") +'"
                 }
             })
