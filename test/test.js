@@ -25,18 +25,17 @@ describe('basic', function () {
 describe('statements', function () {
     var source = 
 (function () {/*
-//# for (var i=4, item; item=i--;) {
-{{item}}
-//# }
+{{#items}}
+    {{this}}
+{{/items}}
 */}).toString().slice(16, -4)
       
-      , data = { items: [1, 2] }
+      , data = { items: [1, 2, 3, 4] }
 
     it('should success', function () {
         var template = lt.compile(source)
 
         var result = template.render(data)
-
         assert.notStrictEqual(result.search('4'), -1)
     })
 })
