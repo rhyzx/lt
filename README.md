@@ -1,25 +1,82 @@
-# LT
+LT
+==
 
-Little Template engine.
+A **L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
+template specification implemented in js.
 
 
-## Syntax
+Syntax
+------
 
-### variables
+Detail see [here](http://mustache.github.com/mustache.5.html "Mustache")
 
-`this is {{name}}`
 
-### statements
+### Variables
 
-```js
-//# if (true) {
-this is true
-//# }
-
-//# for (var i=0; i<5; i++) {
-here is NO.{{i}}
-//# }
+```mustache
+this is {{name}}
 ```
+
+
+### Sections
+
+Print Non-False values or iterator Non-Empty lists.
+
+```mustache
+{{#items}}
+    {{name}}
+{{/items}}
+```
+
+### Inverted Sections
+
+```mustache
+{{^money}}
+    show me the money
+{{/money}}
+```
+
+### Comments
+
+```mustache
+{{! here is comments }}
+```
+
+Extra Features
+--------------
+
+### Nested path
+
+LT supports nested path like javascript, note that it will throw error if uppper
+level is an undefined value(null/undefined).
+
+```mustache
+this is {{path.to.value}}
+```
+
+### `this` context
+
+Access the current context by `this` variable, useful in iterating a list with
+pure values.
+
+data
+```json
+{
+  "items" : [
+    "first",
+    "second",
+    "third"
+  ]
+}
+```
+
+template
+```mustache
+{{#items}}
+    {{this}}
+{{/items}}
+```
+
 
 API
 ---
