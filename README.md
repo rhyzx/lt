@@ -19,7 +19,7 @@ this is {{name}}
 self print {{.}}
 ```
 
-## Unescape HTML tags
+### Unescape HTML tags
 
 ```mustache
 print some html {{&content}}
