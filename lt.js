@@ -42,6 +42,7 @@
                     return "'; }); result += '"
                 case '!':   // comments
                     return ""
+                //case '>':   // TODO partials
                 case '&':   // print unescape
                     escape = false
                 default :   // print escape

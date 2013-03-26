@@ -1,8 +1,8 @@
 LT
 ==
 
-A **L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
-template specification implemented in js.
+**L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
+specification implemented in javascript.
 
 
 Syntax
@@ -15,12 +15,19 @@ Detail see [here](http://mustache.github.com/mustache.5.html "Mustache")
 
 ```mustache
 this is {{name}}
+
+self print {{.}}
 ```
 
+## Unescape HTML tags
+
+```mustache
+print some html {{&content}}
+```
 
 ### Sections
 
-Print Non-False values or iterator Non-Empty lists.
+Use Non-False values or iterate Non-Empty lists.
 
 ```mustache
 {{#items}}
@@ -47,8 +54,8 @@ Extra Features
 
 ### Nested path
 
-LT supports nested path like javascript, note that it will throw error if uppper
-level is an undefined value(null/undefined).
+LT supports nested path like javascript.
+Note that you cannot read property of null or undefined value.
 
 ```mustache
 this is {{path.to.value}}
