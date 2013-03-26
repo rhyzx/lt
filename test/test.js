@@ -21,21 +21,132 @@ describe('basic', function () {
     })
 })
 
+describe('variable', function () {
+    it('should print true/false', function () {
+        var source = (function () {/*
+                {{a}}
+                {{b}}
+            */}).toString().slice(16, -4)
+        var data = { a: true, b: false }
 
-describe('statements', function () {
-    var source = 
-(function () {/*
-{{#items}}
-    {{this}}
-{{/items}}
-*/}).toString().slice(16, -4)
-      
-      , data = { items: [1, 2, 3, 4] }
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('true'), -1)
+        assert.notStrictEqual(result.search('false'), -1)
+    })
 
-    it('should success', function () {
-        var template = lt.compile(source)
+    it('should not print undefined value', function () {
+        var source = (function () {/*
+                {{undef}}
+                {{none}}
+            */}).toString().slice(16, -4)
+        var data = { undef: undefined}
 
-        var result = template.render(data)
+        var result = lt.compile(source).render(data)
+          
+        assert.strictEqual(result.replace(/\s/g, ''), '')
+    })
+})
+
+describe('section', function () {
+    it('should use Non-False value', function () {
+        var source = (function () {/*
+            {{#val}}
+                here
+            {{/val}}
+            */}).toString().slice(16, -4)
+        var data = { val: true }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('here'), -1)
+    })
+
+    it('should use Object', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{name}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: {name: 'here'} }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('here'), -1)
+    })
+    
+    it('should iterate every item in list', function () {
+        var source = (function () {/*
+            {{#list}}
+                {{a}}
+                {{b}}
+            {{/list}}
+            */}).toString().slice(16, -4)
+        var data = { list: [{a: 'foo'}, {b: 'bar'}] }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('foo'), -1)
+        assert.notStrictEqual(result.search('bar'), -1)
+    })
+
+    it('should not iterate empty list', function () {
+        var source = (function () {/*
+            {{#list}}
+                here
+            {{/list}}
+            */}).toString().slice(16, -4)
+        var data = { list: [] }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.strictEqual(result.search('here'), -1)
+    })
+
+})
+
+describe('inverted section', function () {
+    it('should not iterate list', function () {
+        var source = (function () {/*
+            {{#list}}
+                {{a}}
+                {{b}}
+            {{/list}}
+            */}).toString().slice(16, -4)
+        var data = { list: [{a: 'foo'}, {b: 'bar'}] }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('foo'), -1)
+        assert.notStrictEqual(result.search('bar'), -1)
+    })
+})
+
+describe('this context', function () {
+
+    it('should print object', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{.}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: {} }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('Object'), -1)
+    })
+
+    it('should print list item', function () {
+        var source = (function () {/*
+            {{#list}}
+                {{.}}
+            {{/list}}
+            */}).toString().slice(16, -4)
+        var data = { list: [1, 2, 3, 4] }
+
+        var result = lt.compile(source).render(data)
+          
         assert.notStrictEqual(result.search('4'), -1)
     })
 })
