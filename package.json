@@ -12,8 +12,7 @@
   "main"        : "lt",
   
   "devDependencies" : {
-    "mocha"     : "1.8.x",
-    "should"    : "1.2.x"
+    "mocha"     : "1.8.x"
   },
   "scripts"     : {
     "test"      : "mocha -R spec"
