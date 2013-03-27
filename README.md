@@ -1,5 +1,6 @@
 LT
 ==
+[![Build Status](https://travis-ci.org/rhyzx/lt.png?branch=master)](https://travis-ci.org/rhyzx/lt)
 
 **L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
 specification implemented in javascript.
