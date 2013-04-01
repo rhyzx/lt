@@ -6,11 +6,37 @@
         return Object.prototype.toString.call(obj) === '[object Array]'
     }
     
-    // 'this' hook for template using
-    var Hook = function (data) { this.stack = [data] } // context stack
+    // core
+    function Template(source) {
+        this.compiled = new Function("var out = '" +source
+            .replace(/\\/g, "\\\\") // escape \
+            .replace(/'/g, "\\'")   // escape '
+            .replace(/\{\{(.+?)\}\}/g, function (a, scope) { // block
+                var invert = false, escape = true
+                switch (scope[0]) {
+                case '^':   // if not
+                    invert = true
+                case '#':   // if/each/TODO lambdas/TODO helper
+                    return "'; this.use('" +scope.slice(1) +"', " +invert 
+                           +", function () { out += '"
+                case '/':   // close
+                    return "'; }); out += '"
+                case '!':   // comments
+                    return ""
+                //case '>':   // TODO partials
+                case '&':   // print unescape
+                    escape = false
+                    scope = scope.slice(1)
+                default :   // print escape
+                    return "' +this.print('" +scope +"', " +escape +") +'"
+                }
+            })
+            .replace(/\n/g, "\\n") // escape cr
+            +"'; return out")
+    }
 
     // value getter
-    Hook.prototype.get = function (scope) {
+    Template.prototype.get = function (scope) {
         var val, pcount = 0, stack = this.stack
         var scopes = scope.replace(/\s/g, '') // clear empty
                         .replace(/^(\.\.\/)+/, function (all, one) {
@@ -39,7 +65,7 @@
 
     // escape HTML chars http://www.w3.org/TR/html4/charset.html#h-5.3.2
     var escapes = { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }
-    Hook.prototype.print = function (scope, escape) { // print string and escape
+    Template.prototype.print = function (scope, escape) { // print string and escape
         var val = this.get(scope)
         if (typeof val === 'undefined') return '' // placeholder
         return !escape ? val : (val +'').replace(/[<>&"]/g, function (char) {
@@ -48,9 +74,9 @@
     }
 
     // iterate Non-Empty list or use Non-False value
-    Hook.prototype.use = function (scope, reverse, iterator) {
+    Template.prototype.use = function (scope, invert, iterator) {
         var val = this.get(scope)
-        if (reverse) {
+        if (invert) {
             if (!val || (_isArray(val) && val.length === 0)) {
                 iterator.call(this)
             }
@@ -64,43 +90,24 @@
         }
     }
 
-    // core
-    function compile(source) {
-        var body = "var out = '" +source
-            .replace(/\\/g, "\\\\") // escape \
-            .replace(/'/g, "\\'")   // escape '
-            .replace(/\{\{(.+?)\}\}/g, function (a, scope) { // block
-                var reverse = false, escape = true
-                switch (scope[0]) {
-                case '^':   // if not
-                    reverse = true
-                case '#':   // if/each/TODO lambdas/TODO helper
-                    return "'; this.use('" +scope.slice(1) +"', " +reverse 
-                           +", function () { out += '"
-                case '/':   // close
-                    return "'; }); out += '"
-                case '!':   // comments
-                    return ""
-                //case '>':   // TODO partials
-                case '&':   // print unescape
-                    scope = scope.slice(1)
-                    escape = false
-                default :   // print escape
-                    return "' +this.print('" +scope +"', " +escape +") +'"
-                }
-            })
-            .replace(/\n/g, "\\n") // escape cr
-            +"'; return out"
-
-        var compiled = new Function(body)
-        var template = function (data) {
-            return compiled.call(new Hook(data))
-        }
-        return template.render = template // render api
+    // output
+    Template.prototype.render = function (data) {
+        this.stack = [data]
+        return this.compiled()
     }
 
-    // compile api
+    
+    // ========
+    // wrap api
+    var compile = function (source) {
+        var template = new Template(source)
+        var render = function (data) {
+            return template.render(data)
+        }
+        return render.render = render
+    }
     compile.compile = compile
+
 
     // exports
     if (typeof module !== 'undefined' && module.exports) {
