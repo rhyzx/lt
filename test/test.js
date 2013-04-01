@@ -69,7 +69,6 @@ describe('variable', function () {
 
         var result = lt.compile(source).render(data)
           
-        console.log(result);
         assert.notStrictEqual(result.search('<'), -1)
         assert.notStrictEqual(result.search('>'), -1)
         assert.notStrictEqual(result.search('"'), -1)
