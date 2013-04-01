@@ -46,6 +46,35 @@ describe('variable', function () {
           
         assert.strictEqual(result.replace(/\s/g, ''), '')
     })
+
+    it('should escape html chars', function () {
+         var source = (function () {/*
+                {{content}}
+            */}).toString().slice(16, -4)
+        var data = { content: '<html class="nice"> &x'}
+
+        var result = lt.compile(source).render(data)
+          
+        assert.strictEqual(result.search('<'), -1)
+        assert.strictEqual(result.search('>'), -1)
+        assert.strictEqual(result.search('"'), -1)
+        assert.strictEqual(result.search('&x'), -1)
+    })
+
+    it('should not escape html chars', function () {
+         var source = (function () {/*
+                {{&content}}
+            */}).toString().slice(16, -4)
+        var data = { content: '<html class="nice"> &x'}
+
+        var result = lt.compile(source).render(data)
+          
+        console.log(result);
+        assert.notStrictEqual(result.search('<'), -1)
+        assert.notStrictEqual(result.search('>'), -1)
+        assert.notStrictEqual(result.search('"'), -1)
+        assert.notStrictEqual(result.search('&x'), -1)
+    })
 })
 
 describe('section', function () {
@@ -122,6 +151,22 @@ describe('inverted section', function () {
     })
 })
 
+
+describe('scope inherits', function () {
+    it('should not print scope of parent context if current not exist', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{name}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: {}, name: 'parent' }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('parent'), -1)
+    })
+})
+
 describe('this context', function () {
 
     it('should print object', function () {
@@ -148,5 +193,33 @@ describe('this context', function () {
         var result = lt.compile(source).render(data)
           
         assert.notStrictEqual(result.search('4'), -1)
+    })
+})
+
+describe('parent path', function (done) {
+    it('should print parent object', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{../.}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: {} }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('Object'), -1)
+    })
+
+    it('should print parent scope', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{../name}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: {name: 'child'}, name: 'parent' }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('parent'), -1)
     })
 })
