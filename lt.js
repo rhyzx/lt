@@ -48,7 +48,8 @@
     }
 
     // iterate Non-Empty list or use Non-False value
-    Hook.prototype.use = function (val, reverse, iterator) {
+    Hook.prototype.use = function (scope, reverse, iterator) {
+        var val = this.get(scope)
         if (reverse) {
             if (!val || (_isArray(val) && val.length === 0)) {
                 iterator.call(this)
@@ -73,7 +74,7 @@
                 switch (scope[0]) {
                 case '^':   // if not
                     reverse = true
-                case '#':   // if/each/TODO helper
+                case '#':   // if/each/TODO lambdas/TODO helper
                     return "'; this.use('" +scope.slice(1) +"', " +reverse 
                            +", function () { out += '"
                 case '/':   // close
