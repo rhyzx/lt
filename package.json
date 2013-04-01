@@ -1,7 +1,7 @@
 {
   "name"        : "lt",
   "description" : "Little Template engine for {{mustache}}",
-  "version"     : "0.2.0",
+  "version"     : "0.2.2",
   "author"      : "rhyzx",
   "homepage"    : "https://github.com/rhyzx/lt",
   "keywords"    : [ "template", "html", "little", "mustache", "logicless" ],
