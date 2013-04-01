@@ -62,6 +62,15 @@ Note that you cannot read property of null or undefined value.
 this is {{path.to.value}}
 ```
 
+### Parent path
+
+`../` references that use variable of parent context.
+
+```mustache
+{{#child}}
+    {{../name}}
+{{/child}}
+```
 
 API
 ---
