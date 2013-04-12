@@ -134,9 +134,22 @@ describe('section', function () {
 })
 
 describe('inverted section', function () {
+    it('should use False', function () {
+        var source = (function () {/*
+            {{^val}}
+                {{a}}
+            {{/val}}
+            */}).toString().slice(16, -4)
+        var data = { val: false, a: 'yes' }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.notStrictEqual(result.search('yes'), -1)
+    })
+
     it('should not iterate list', function () {
         var source = (function () {/*
-            {{#list}}
+            {{^list}}
                 {{a}}
                 {{b}}
             {{/list}}
@@ -145,14 +158,14 @@ describe('inverted section', function () {
 
         var result = lt.compile(source).render(data)
           
-        assert.notStrictEqual(result.search('foo'), -1)
-        assert.notStrictEqual(result.search('bar'), -1)
+        assert.strictEqual(result.search('foo'), -1)
+        assert.strictEqual(result.search('bar'), -1)
     })
 })
 
 
 describe('scope inherits', function () {
-    it('should not print scope of parent context if current not exist', function () {
+    it('should print scope of parent context if current not exist', function () {
         var source = (function () {/*
             {{#obj}}
                 {{name}}
@@ -163,6 +176,19 @@ describe('scope inherits', function () {
         var result = lt.compile(source).render(data)
           
         assert.notStrictEqual(result.search('parent'), -1)
+    })
+
+    it('should scope the defined context', function () {
+        var source = (function () {/*
+            {{#obj}}
+                {{name.val}}
+            {{/obj}}
+            */}).toString().slice(16, -4)
+        var data = { obj: { name: {} }, name: {val:'parent'} }
+
+        var result = lt.compile(source).render(data)
+          
+        assert.strictEqual(result.search('parent'), -1)
     })
 })
 
