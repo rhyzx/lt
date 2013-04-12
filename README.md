@@ -1,9 +1,20 @@
 LT
 ==
+
 [![Build Status](https://travis-ci.org/rhyzx/lt.png?branch=master)](https://travis-ci.org/rhyzx/lt)
 
 **L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
 specification implemented in javascript.
+
+
+Installation
+-------
+
+```sh
+$ npm install lt
+```
+
+or [download](https://github.com/rhyzx/lt/raw/master/lt.js)
 
 
 Syntax
@@ -50,6 +61,15 @@ Use Non-False values or iterate Non-Empty lists.
 {{! here is comments }}
 ```
 
+### Partials
+
+TODO
+
+### Lambdas
+
+TODO
+
+
 Extra Features
 --------------
 
@@ -72,13 +92,13 @@ this is {{path.to.value}}
 {{/child}}
 ```
 
+
 API
 ---
 
 ### lt(source), lt.compile(source)
 
-Compile source(String) to a template(Function)
-
+Compile source(String) to **template**(Function)
 
 ### template(data), template.render(data)
 
