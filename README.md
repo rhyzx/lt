@@ -92,6 +92,11 @@ this is {{path.to.value}}
 {{/child}}
 ```
 
+### Extremely fast
+
+[Morden Mustache-style template engine Benchmark](http://jsperf.com/mustache-style-template-engine-perf)
+![Benchmark](https://f.cloud.github.com/assets/1676871/373128/5c9c8874-a378-11e2-8ab3-9e954109b5f0.png)
+
 
 API
 ---
