@@ -1,113 +1,74 @@
+/*!
+ * LT - Little Template engine of {{mustache}}
+ * https://github.com/rhyzx/lt
+ */
 !(function (root, undefined) {
-    "use strict" 
-
-    // help function
     var _isArray = Array.isArray || function(obj) {
         return Object.prototype.toString.call(obj) === '[object Array]'
     }
-    
-    // core
-    function Template(source) {
-        this.compiled = new Function("var out = '" +source
-            .replace(/\\/g, "\\\\") // escape \
-            .replace(/'/g, "\\'")   // escape '
-            .replace(/\{\{(.+?)\}\}/g, function (a, scope) { // block
-                var invert = false, escape = true
-                switch (scope[0]) {
-                case '^':   // if not
-                    invert = true
-                case '#':   // if/each/TODO lambdas/TODO helper
-                    return "'; this.use('" +scope.slice(1) +"', " +invert 
-                           +", function () { out += '"
-                case '/':   // close
-                    return "'; }); out += '"
-                case '!':   // comments
-                    return ""
-                //case '>':   // TODO partials
-                case '&':   // print unescape
-                    escape = false
-                    scope = scope.slice(1)
-                default :   // print escape
-                    return "' +this.print('" +scope +"', " +escape +") +'"
-                }
-            })
-            .replace(/\n/g, "\\n") // escape cr
-            +"'; return out")
+
+    // print value
+    function print(value, escape) {
+        return typeof value === 'undefined'
+             ? '' // placeholder
+             : ( escape && /[<>&"]/.test(value += '') )
+             // escape HTML chars http://www.w3.org/TR/html4/charset.html#h-5.3.2
+             ? value.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/&/g, '&amp;')
+             : value
     }
 
-    // value getter
-    Template.prototype.get = function (scope) {
-        var val, pcount = 0, stack = this.stack
-        var scopes = scope.replace(/\s/g, '') // clear empty
-                        .replace(/^(\.\.\/)+/, function (all, one) {
-                            pcount = all.length / one.length // parent path count
-                            return ''
-                        })
-                        .split('.')
-
-        // get context
-        if (scopes[0] === '') { // . 'this' context
-            if (scopes[1] === '') scopes.shift() // '.'.split('.') = ['', ''] ?
-            val = stack[stack.length-1 -pcount]
-        } else { // search context with specified scope
-            for (var i=stack.length-1 - pcount; i>=0; i--) {
-                if (typeof (val=stack[i][scopes[0]]) !== 'undefined') break
-            } 
-        }
-        
-        for (var i=1, len=scopes.length; i<len; i++) {
-            if (typeof val === 'undefined') return // undefined
-            val = val[scopes[i]]
-        } // get nested value
-
-        return val
-    }
-
-    // escape HTML chars http://www.w3.org/TR/html4/charset.html#h-5.3.2
-    var escapes = { '<': '&lt;', '>': '&gt;', '&': '&amp;', '"': '&quot;' }
-    Template.prototype.print = function (scope, escape) { // print string and escape
-        var val = this.get(scope)
-        if (typeof val === 'undefined') return '' // placeholder
-        return !escape ? val : (val +'').replace(/[<>&"]/g, function (char) {
-            return escapes[char] // escape
+    // get defined value from context stack
+    function get(scope, depth) {
+        scope = scope.replace(/^(\.\.\/)+/, function (all, one) {
+            depth -= all.length / one.length // parent path
+            return ''
         })
+        if (depth < 0) return "undefined"
+        if (scope === '.') return "s" +depth // this
+        var first = scope.match(/^[^.]+/)[0]  // nest path support, extract first scope for context finding
+        var code = ''
+        while (depth > 0) code += "typeof s" +depth +"." +first +" !== 'undefined' ? s" +depth-- +"." +scope +" : "
+        return code +"s0." +scope
     }
 
-    // iterate Non-Empty list or use Non-False value
-    Template.prototype.use = function (scope, invert, iterator) {
-        var val = this.get(scope)
-        if (invert) {
-            if (!val || (_isArray(val) && val.length === 0)) {
-                iterator.call(this)
+    // core
+    function compile(source) {
+        var inverted = 0, depth = 0 // context stack depth
+        var compiled = new Function("s0", "print", "_isArray", "var out = '" +source
+        .replace(/\\/g, "\\\\") // escape \
+        .replace(/'/g, "\\'")   // escape '
+        .replace(/\{\{([\^#/!&]?)(.+?)\}\}/g, function (a, flag, scope) { // block
+            switch (flag) {
+            case '^':   // if not
+                inverted++
+                return "'; var value = " +get(scope, depth)
+                     + " ; if (!value || (_isArray(value) && value.length === 0)) { out += '"
+            case '#':   // if/each/TODO lambdas/TODO helper
+                return "'; var value = " +get(scope, depth++)
+                     + " ; var list = value ? _isArray(value) ? value : [value] : []"
+                     + " ; for (var i=0, len=list.length; i<len; i++) {"
+                     + " ; var s" +depth +" = list[i]; out += '"
+            case '/':   // close
+                inverted > 0 ? inverted-- : depth--
+                return "'} out += '"
+            case '!':   // comments
+                return ""
+            //case '>':   // TODO partials
+            case '&':   // print noescape
+                return "' +print(" +get(scope, depth) +", false) +'"
+            default :   // print escape
+                return "' +print(" +get(scope, depth) +", true) +'"
             }
-        } else {
-            var list = val ? _isArray(val) ? val : [val] : []
-            for (var i=0, len=list.length; i<len; i++) {
-                this.stack.push(list[i])
-                iterator.call(this)
-                this.stack.pop()
-            }
+        })
+        .replace(/\n/g, "\\n") // escape cr
+        +"'; return out")
+
+        var template = function (data) {
+            return compiled(data, print, _isArray)
         }
+        return template.render = template // render api
     }
-
-    // output
-    Template.prototype.render = function (data) {
-        this.stack = [data]
-        return this.compiled()
-    }
-
-    
-    // ========
-    // wrap api
-    var compile = function (source) {
-        var template = new Template(source)
-        var render = function (data) {
-            return template.render(data)
-        }
-        return render.render = render
-    }
-    compile.compile = compile
-
+    compile.compile = compile // compile api
 
     // exports
     if (typeof module !== 'undefined' && module.exports) {
