@@ -38,25 +38,24 @@
         .replace(/\\/g, "\\\\") // escape \
         .replace(/'/g, "\\'")   // escape '
         .replace(/\{\{([\^#/!&]?)(.+?)\}\}/g, function (a, flag, scope) { // block
-            switch (flag) {
-            case '^':   // if not
-                inverted++
-                return "'; var value = " +get(scope, depth)
-                     + " ; if (!value || (_isArray(value) && value.length === 0)) { out += '"
-            case '#':   // if/each/TODO lambdas/TODO helper
+            if (flag=='/') { // close (most common so it is on top)
+                inverted > 0 ? inverted-- : depth--
+                return "'} out += '"
+            } else if (flag=='#') { // if/each/TODO lambdas/TODO helper
                 return "'; var value = " +get(scope, depth++)
                      + " ; var list = value ? _isArray(value) ? value : [value] : []"
                      + " ; for (var i=0, len=list.length; i<len; i++) {"
                      + " ; var s" +depth +" = list[i]; out += '"
-            case '/':   // close
-                inverted > 0 ? inverted-- : depth--
-                return "'} out += '"
-            case '!':   // comments
+            } else if (flag=='!') { // comments
                 return ""
-            //case '>':   // TODO partials
-            case '&':   // print noescape
+            } else if (flag=='^') { // if not ("inverted")
+                inverted++
+                return "'; var value = " +get(scope, depth)
+                     + " ; if (!value || (_isArray(value) && value.length === 0)) { out += '"
+    //        } else if (flag='>') { // TODO partials
+            } else if (flag=='&') { // print noescape
                 return "' +print(" +get(scope, depth) +", false) +'"
-            default :   // print escape
+            } else  { // default: print escape
                 return "' +print(" +get(scope, depth) +", true) +'"
             }
         })
