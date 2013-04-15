@@ -37,7 +37,7 @@
         var compiled = new Function("s0", "print", "_isArray", "var out = '" +source
         .replace(/\\/g, "\\\\") // escape \
         .replace(/'/g, "\\'")   // escape '
-        .replace(/\{\{([\^#/!&]?)(.+?)\}\}/g, function (a, flag, scope) { // block
+        .replace(/\{\{([\^#/!&]?)([^{\n]+?)\}\}/g, function (a, flag, scope) { // block
             switch (flag) {
             case '^':   // if not
                 inverted++
