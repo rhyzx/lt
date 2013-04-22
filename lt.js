@@ -11,9 +11,9 @@
     function print(value, escape) {
         return typeof value === 'undefined'
              ? '' // placeholder
-             : ( escape && /[<>&"]/.test(value += '') )
+             : ( escape && /[&"<>]/.test(value += '') )
              // escape HTML chars http://www.w3.org/TR/html4/charset.html#h-5.3.2
-             ? value.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/&/g, '&amp;')
+             ? value.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
              : value
     }
 
