@@ -19,7 +19,9 @@
 
     // get defined value from context stack
     function get(scope, depth) {
-        scope = scope.replace(/^(\.\.\/)+/, function (all, one) {
+        scope = scope
+        .replace(/\s/g, '') // clear space
+        .replace(/^(\.\.\/)+/, function (all, one) {
             depth -= all.length / one.length // parent path
             return ''
         })
