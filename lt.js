@@ -60,7 +60,8 @@
                 return "' +print(" +get(scope, depth) +", true) +'"
             }
         })
-        .replace(/\n/g, "\\n") // escape cr
+        .replace(/\n/g, "\\n") // escape CR
+        .replace(/\r/g, "\\r") // escape LF
         +"'; return out")
 
         var template = function (data) {
