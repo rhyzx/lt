@@ -36,20 +36,21 @@
     // core
     function compile(source) {
         var inverted = 0, depth = 0 // context stack depth
-        var compiled = new Function("s0", "print", "_isArray", "var out = '" +source
+        var compiled = new Function("s0", "print", "_isArray", "var tmp, out = '" +source
         .replace(/\\/g, "\\\\") // escape \
         .replace(/'/g, "\\'")   // escape '
         .replace(/\{\{([\^#/!&]?)([^{\n]+?)\}\}/g, function (a, flag, scope) { // block
             switch (flag) {
             case '^':   // if not
                 inverted++
-                return "'; var value = " +get(scope, depth)
-                     + " ; if (!value || (_isArray(value) && value.length === 0)) { out += '"
+                return "'; tmp = " +get(scope, depth)
+                     + " ; if (!tmp || (_isArray(tmp) && tmp.length === 0)) { out += '"
             case '#':   // if/each/TODO lambdas/TODO helper
-                return "'; var value = " +get(scope, depth++)
-                     + " ; var list = value ? _isArray(value) ? value : [value] : []"
-                     + " ; for (var i=0, len=list.length; i<len; i++) {"
-                     + " ; var s" +depth +" = list[i]; out += '"
+                return "'; tmp = " +get(scope, depth)
+                     + " ; var list" +depth +" = tmp ? _isArray(tmp) ? tmp : [tmp] : []"
+                     + " ; for (var i" +depth +"=0, len" +depth +"=list" +depth +".length"
+                     + " ;      i" +depth +"<len" +depth +"; i" +depth +"++)"
+                     + " { var s" +(depth+1) +" = list" +depth +"[i" +depth++ +"]; out += '"
             case '/':   // close
                 inverted > 0 ? inverted-- : depth--
                 return "'} out += '"
