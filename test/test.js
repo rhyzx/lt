@@ -131,6 +131,22 @@ describe('section', function () {
         assert.strictEqual(result.search('here'), -1)
     })
 
+    it('should iterate nested list correctly', function () {
+        var source = (function () {/*
+            {{#list}}
+                {{#list}}
+                    {{v}}
+                {{/list}}
+            {{/list}}
+            */}).toString().slice(16, -4)
+        var data = { list: [
+            { list: [{v:1}, {v:2}]}
+          , { list: [{v:3}, {v:4}]}
+        ]}
+
+        var result = lt.compile(source).render(data)
+        assert.notStrictEqual(result.search('4'), -1)
+    })
 })
 
 describe('inverted section', function () {
