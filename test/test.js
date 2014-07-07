@@ -264,3 +264,25 @@ describe('parent path', function (done) {
     assert.notStrictEqual(result.search('parent'), -1)
   })
 })
+
+describe('nested path', function (done) {
+  it('should print var in nested path', function () {
+    var source = (function () {/*
+      {{ obj.child.name }}
+      */}).toString().slice(16, -4)
+    var data = { obj: { child : { name: 'here' } } }
+
+    var result = lt.compile(source).render(data)
+      
+    assert.notStrictEqual(result.search('here'), -1)
+  })
+
+  it('should not throw error when nested path not exist', function () {
+    var source = (function () {/*
+      {{ obj.child.none.name }}
+      */}).toString().slice(16, -4)
+    var data = { obj: {child: {}} }
+
+    var result = lt.compile(source).render(data)
+  })
+})
