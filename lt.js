@@ -22,12 +22,39 @@ function get(scope, depth) {
     depth -= all.length / one.length // parent path
     return ''
   })
-  if (depth < 0) return "undefined"
+  
+  if (depth < 0) return "undefined" // out of context
   if (scope === '.') return "s" +depth // this
-  var first = scope.match(/^[^.]+/)[0]  // nest path support, extract first scope for context finding
+  var scopeParts = scope.split('.')
   var code = ''
-  while (depth > 0) code += "typeof s" +depth +"." +first +" !== 'undefined' ? s" +depth-- +"." +scope +" : "
-  return code +"s0." +scope
+  while (depth > 0) {
+    var scopeSegment = scopeParts[0]
+
+    // parent context searching
+    code += "typeof s" +depth +"." +scopeSegment +" !== 'undefined' ? "
+
+    // nested path context searching
+    for (var i=1, len=scopeParts.length; i<len; i++) {
+      code += "typeof s" +depth +"." +scopeSegment +" === 'undefined' ? undefined : "
+      scopeSegment += "." +scopeParts[i]
+    }
+    code += "s" +depth +"." +scopeSegment +" : "
+
+    depth--
+  }
+    var scopeSegment = scopeParts[0]
+
+    // parent context searching
+    // code += "typeof s" +depth +"." +scopeSegment +" !== 'undefined' ? "
+
+    // nested path context searching
+    for (var i=1, len=scopeParts.length; i<len; i++) {
+      code += "typeof s" +depth +"." +scopeSegment +" === 'undefined' ? undefined : "
+      scopeSegment += "." +scopeParts[i]
+    }
+    code += "s" +depth +"." +scopeSegment // +" : "
+
+  return code
 }
 
 // core
