@@ -1,14 +1,12 @@
-LT
-==
+# LT
 
 [![Build Status](https://travis-ci.org/rhyzx/lt.png?branch=master)](https://travis-ci.org/rhyzx/lt)
 
-**L**ittle **T**emplate engine with [{{Mustache}}](http://mustache.github.com)
+<strong>L</strong>ittle <strong>T</strong>emplate engine with [{{Mustache}}](http://mustache.github.com)
 specification implemented in javascript.
 
 
-Installation
--------
+## Installation
 
 ```sh
 $ npm install lt
@@ -17,8 +15,7 @@ $ npm install lt
 or [download](https://github.com/rhyzx/lt/raw/master/lt.js)
 
 
-Syntax
-------
+## Syntax
 
 Detail see [here](http://mustache.github.com/mustache.5.html "Mustache")
 
@@ -70,13 +67,11 @@ TODO
 TODO
 
 
-Extra Features
---------------
+## Extra Features
 
 ### Nested path
 
 LT supports nested path like javascript.
-Note that you cannot read property of null or undefined value.
 
 ```mustache
 this is {{path.to.value}}
@@ -98,8 +93,7 @@ this is {{path.to.value}}
 ![Benchmark](https://f.cloud.github.com/assets/1676871/373128/5c9c8874-a378-11e2-8ab3-9e954109b5f0.png)
 
 
-API
----
+## API
 
 ### lt(source), lt.compile(source)
 
@@ -110,8 +104,6 @@ Compile source(String) to **template**(Function)
 Render data(Object/JSON), return String
 
 
-License
--------
+## License
 
 [MIT](https://github.com/rhyzx/lt/blob/master/LICENSE "License")
-
